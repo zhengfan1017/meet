@@ -43,6 +43,6 @@ export function extractTags(raw) {
 export function stripMarkers(text) {
   return String(text || '')
     .replace(/\[\[(emo|mem):[^\]\n]*\]\]/g, '')
-    .replace(/\[\[(emo|mem):[^\n]*$/, '')
+    .replace(/\[\[[^\n]*$/, '')
     .trim();
 }

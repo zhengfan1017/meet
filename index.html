@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#F5F1E8" />
+<title>Trae宝</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="stylesheet" href="app.css" />
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <button type="button" id="openSettings" class="ghost-btn">设置</button>
+    <div id="stage" class="stage"></div>
+  </header>
+  <main id="timeline" class="timeline"></main>
+  <div id="banner" class="banner" hidden></div>
+  <form id="composer" class="composer">
+    <textarea id="input" rows="1" placeholder="跟 Trae宝 说点什么…"></textarea>
+    <button type="submit">发送</button>
+  </form>
+</div>
+
+<div id="settings" class="settings" hidden>
+  <div class="settings-card">
+    <div class="settings-head">
+      <h2>设置</h2>
+      <button type="button" id="closeSettings">关闭</button>
+    </div>
+    <form id="settingsForm">
+      <label>接入方式
+        <select name="mode">
+          <option value="direct">方舟直连</option>
+          <option value="worker">Worker 代理</option>
+        </select>
+      </label>
+
+      <div id="directBox">
+        <label>接口地址<input name="endpoint" type="url" placeholder="https://ark.cn-beijing.volces.com/api/v3/chat/completions" /></label>
+        <label>API Key<span class="inline"><input name="apiKey" type="password" /><button type="button" id="toggleKey">显示</button></span></label>
+        <label>模型名<input name="model" type="text" placeholder="doubao-seed-1-6-250615" /></label>
+      </div>
+
+      <div id="workerBox" hidden>
+        <label>Worker 地址<input name="workerUrl" type="url" placeholder="https://your-worker.workers.dev/v1/chat/completions" /></label>
+        <label>访问令牌<input name="accessToken" type="password" /></label>
+      </div>
+
+      <h3>它记住的事</h3>
+      <div id="memoryList" class="memory-list"></div>
+
+      <button type="button" id="clearAll" class="danger">清除所有数据</button>
+      <button type="submit" class="primary">保存</button>
+    </form>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
