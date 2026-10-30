@@ -1,6 +1,6 @@
 # Trae宝 PWA 实施计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 构建一个可安装到 Android 桌面、具备立绘情绪切换与跨会话长期记忆的 Trae宝 情感陪伴聊天 PWA。
 
@@ -49,7 +49,7 @@
 - Create: `tools/make_icons.py`
 - Create: `icons/icon-192.png`, `icons/icon-512.png`
 
-- [ ] **Step 1: 写 package.json**
+- [x] **Step 1: 写 package.json**
 
 ```json
 {
@@ -64,7 +64,7 @@
 }
 ```
 
-- [ ] **Step 2: 写图标生成脚本**
+- [x] **Step 2: 写图标生成脚本**
 
 `tools/make_icons.py`：
 
@@ -93,12 +93,12 @@ if __name__ == "__main__":
         print("wrote", name)
 ```
 
-- [ ] **Step 3: 生成图标**
+- [x] **Step 3: 生成图标**
 
 Run: `cd /workspace/traebao-pwa && python3 tools/make_icons.py`
 Expected: 输出 `wrote icon-192.png` / `wrote icon-512.png`，两文件存在且 `file` 报 PNG
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```bash
 git add package.json tools/make_icons.py icons/
@@ -113,7 +113,7 @@ git commit -m "chore: 初始化项目骨架与桌面图标"
 - Create: `src/mood.js`
 - Create: `test/mood.test.js`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 `test/mood.test.js`：
 
@@ -142,12 +142,12 @@ test('立绘路径指向真实文件', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: FAIL — `Cannot find module '../src/mood.js'`
 
-- [ ] **Step 3: 实现 src/mood.js**
+- [x] **Step 3: 实现 src/mood.js**
 
 ```javascript
 export const EMO_LABELS = [
@@ -174,12 +174,12 @@ export function spritePath(emo, ext = 'gif') {
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS — 全部用例通过
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add src/mood.js test/mood.test.js
@@ -194,7 +194,7 @@ git commit -m "feat: 建立情绪标签与立绘映射表"
 - Create: `src/memory/extractor.js`
 - Create: `test/extractor.test.js`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 `test/extractor.test.js`：
 
@@ -262,12 +262,12 @@ test('stripMarkers 去掉完整标记与未闭合的半个标记', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: FAIL — `Cannot find module '../src/memory/extractor.js'`
 
-- [ ] **Step 3: 实现 src/memory/extractor.js**
+- [x] **Step 3: 实现 src/memory/extractor.js**
 
 ```javascript
 import { EMO_LABELS } from '../mood.js';
@@ -320,12 +320,12 @@ export function stripMarkers(text) {
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS — 全部用例通过
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add src/memory/extractor.js test/extractor.test.js
@@ -340,7 +340,7 @@ git commit -m "feat: 实现输出标记块解析器"
 - Create: `src/memory/backends.js`
 - Create: `test/backends.test.js`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 `test/backends.test.js`：
 
@@ -406,12 +406,12 @@ test('localStorage 后端损坏 JSON 时退化为空表', async () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: FAIL — `Cannot find module '../src/memory/backends.js'`
 
-- [ ] **Step 3: 实现 src/memory/backends.js**
+- [x] **Step 3: 实现 src/memory/backends.js**
 
 ```javascript
 const STORES = ['sessions', 'messages', 'memories', 'kv'];
@@ -557,12 +557,12 @@ export async function createIndexedDBBackend(factory = globalThis.indexedDB) {
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS — 全部用例通过
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add src/memory/backends.js test/backends.test.js
@@ -577,7 +577,7 @@ git commit -m "feat: 实现多后端存储层"
 - Create: `src/memory/store.js`
 - Create: `test/store.test.js`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 `test/store.test.js`：
 
@@ -671,12 +671,12 @@ test('clearAll 清空全部数据', async () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: FAIL — `Cannot find module '../src/memory/store.js'`
 
-- [ ] **Step 3: 实现 src/memory/store.js**
+- [x] **Step 3: 实现 src/memory/store.js**
 
 ```javascript
 import { createIndexedDBBackend, createLocalStorageBackend, createMemoryBackend } from './backends.js';
@@ -829,12 +829,12 @@ export async function createDefaultStore() {
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS — 全部用例通过
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add src/memory/store.js test/store.test.js
@@ -849,7 +849,7 @@ git commit -m "feat: 实现领域存储接口"
 - Create: `src/memory/retriever.js`
 - Create: `test/retriever.test.js`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 `test/retriever.test.js`：
 
@@ -899,12 +899,12 @@ test('无记忆时不产生记忆段落', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: FAIL — `Cannot find module '../src/memory/retriever.js'`
 
-- [ ] **Step 3: 实现 src/memory/retriever.js**
+- [x] **Step 3: 实现 src/memory/retriever.js**
 
 ```javascript
 const DAY = 86400000;
@@ -939,12 +939,12 @@ export function buildContext({ systemPrompt = '', memories = [], messages = [], 
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS — 全部用例通过
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add src/memory/retriever.js test/retriever.test.js
@@ -959,7 +959,7 @@ git commit -m "feat: 实现记忆召回与上下文组装"
 - Create: `src/llm/prompt.js`
 - Create: `test/prompt.test.js`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 `test/prompt.test.js`：
 
@@ -997,12 +997,12 @@ test('记忆段落拼在协议之前', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: FAIL — `Cannot find module '../src/llm/prompt.js'`
 
-- [ ] **Step 3: 实现 src/llm/prompt.js**
+- [x] **Step 3: 实现 src/llm/prompt.js**
 
 ```javascript
 export const PERSONA = `你是 Trae宝，住在用户手机桌面上的一个拼贴风小伙伴。
@@ -1041,12 +1041,12 @@ export function buildSystemPrompt({ persona = PERSONA, protocol = PROTOCOL, memo
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS — 全部用例通过
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add src/llm/prompt.js test/prompt.test.js
@@ -1063,7 +1063,7 @@ git commit -m "feat: 编写人设系统提示词与输出协议"
 - Create: `test/sse.test.js`
 - Create: `test/provider.test.js`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 `test/sse.test.js`：
 
@@ -1234,12 +1234,12 @@ test('流式中途断开归类为 interrupted 错误', async () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: FAIL — `Cannot find module '../src/llm/sse.js'`
 
-- [ ] **Step 3: 实现 src/llm/sse.js**
+- [x] **Step 3: 实现 src/llm/sse.js**
 
 ```javascript
 export function createSSEParser() {
@@ -1276,7 +1276,7 @@ export function parseSSELine(line) {
 }
 ```
 
-- [ ] **Step 4: 实现 src/llm/provider.js**
+- [x] **Step 4: 实现 src/llm/provider.js**
 
 ```javascript
 import { createSSEParser, parseSSELine } from './sse.js';
@@ -1391,12 +1391,12 @@ export function createProvider({
 }
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS — 全部用例通过
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add src/llm/sse.js src/llm/provider.js test/sse.test.js test/provider.test.js
@@ -1413,7 +1413,7 @@ git commit -m "feat: 实现 SSE 解析与模型接入层"
 - Create: `worker/worker.js`
 - Create: `test/adapters.test.js`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 `test/adapters.test.js`：
 
@@ -1460,12 +1460,12 @@ test('代理模式改写地址并带访问令牌', async () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: FAIL — `Cannot find module '../src/llm/doubao.js'`
 
-- [ ] **Step 3: 实现 src/llm/doubao.js**
+- [x] **Step 3: 实现 src/llm/doubao.js**
 
 ```javascript
 import { createProvider } from './provider.js';
@@ -1486,7 +1486,7 @@ export function createDoubaoProvider({
 }
 ```
 
-- [ ] **Step 4: 实现 src/llm/worker.js**
+- [x] **Step 4: 实现 src/llm/worker.js**
 
 ```javascript
 import { createProvider } from './provider.js';
@@ -1514,7 +1514,7 @@ export function createWorkerProvider({
 }
 ```
 
-- [ ] **Step 5: 实现 worker/worker.js**
+- [x] **Step 5: 实现 worker/worker.js**
 
 ```javascript
 const ARK_ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions';
@@ -1548,12 +1548,12 @@ export default {
 };
 ```
 
-- [ ] **Step 6: 运行测试确认通过**
+- [x] **Step 6: 运行测试确认通过**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS — 全部用例通过
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```bash
 git add src/llm/doubao.js src/llm/worker.js worker/worker.js test/adapters.test.js
@@ -1567,7 +1567,7 @@ git commit -m "feat: 实现方舟直连与 Worker 代理适配"
 **Files:**
 - Create: `src/ui/stage.js`
 
-- [ ] **Step 1: 实现 src/ui/stage.js**
+- [x] **Step 1: 实现 src/ui/stage.js**
 
 ```javascript
 import { EMO_LABELS, EMO_SPRITE, DEFAULT_EMO, spritePath } from '../mood.js';
@@ -1646,12 +1646,12 @@ export function createStage(root) {
 }
 ```
 
-- [ ] **Step 2: 手工验证 DOM 结构**
+- [x] **Step 2: 手工验证 DOM 结构**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS（无新增用例，保证既有用例不回归）
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```bash
 git add src/ui/stage.js
@@ -1666,7 +1666,7 @@ git commit -m "feat: 实现立绘舞台区与表情切换"
 - Create: `src/ui/timeline.js`
 - Create: `src/ui/composer.js`
 
-- [ ] **Step 1: 实现 src/ui/timeline.js**
+- [x] **Step 1: 实现 src/ui/timeline.js**
 
 ```javascript
 export function createTimeline(root) {
@@ -1711,7 +1711,7 @@ export function createTimeline(root) {
 }
 ```
 
-- [ ] **Step 2: 实现 src/ui/composer.js**
+- [x] **Step 2: 实现 src/ui/composer.js**
 
 ```javascript
 export function createComposer(root, { onSend }) {
@@ -1754,7 +1754,7 @@ export function createComposer(root, { onSend }) {
 }
 ```
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```bash
 git add src/ui/timeline.js src/ui/composer.js
@@ -1768,7 +1768,7 @@ git commit -m "feat: 实现消息流与输入区"
 **Files:**
 - Create: `src/ui/settings.js`
 
-- [ ] **Step 1: 实现 src/ui/settings.js**
+- [x] **Step 1: 实现 src/ui/settings.js**
 
 ```javascript
 export function createSettings(root, { store, onClose, onModeChange }) {
@@ -1875,7 +1875,7 @@ export function createSettings(root, { store, onClose, onModeChange }) {
 }
 ```
 
-- [ ] **Step 2: 提交**
+- [x] **Step 2: 提交**
 
 ```bash
 git add src/ui/settings.js
@@ -1891,7 +1891,7 @@ git commit -m "feat: 实现设置面板与记忆管理"
 - Create: `app.css`
 - Create: `manifest.webmanifest`
 
-- [ ] **Step 1: 写 index.html**
+- [x] **Step 1: 写 index.html**
 
 ```html
 <!doctype html>
@@ -1959,7 +1959,7 @@ git commit -m "feat: 实现设置面板与记忆管理"
 </html>
 ```
 
-- [ ] **Step 2: 写 app.css**
+- [x] **Step 2: 写 app.css**
 
 ```css
 :root {
@@ -2181,7 +2181,7 @@ html, body {
 .muted { color: var(--muted); font-size: 14px; }
 ```
 
-- [ ] **Step 3: 写 manifest.webmanifest**
+- [x] **Step 3: 写 manifest.webmanifest**
 
 ```json
 {
@@ -2201,7 +2201,7 @@ html, body {
 }
 ```
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```bash
 git add index.html app.css manifest.webmanifest
@@ -2215,7 +2215,7 @@ git commit -m "feat: 添加应用外壳、样式与 PWA 清单"
 **Files:**
 - Create: `src/main.js`
 
-- [ ] **Step 1: 实现 src/main.js**
+- [x] **Step 1: 实现 src/main.js**
 
 ```javascript
 import { createStage } from './ui/stage.js';
@@ -2403,7 +2403,7 @@ if ('serviceWorker' in navigator) {
 }
 ```
 
-- [ ] **Step 2: 提交**
+- [x] **Step 2: 提交**
 
 ```bash
 git add src/main.js
@@ -2417,7 +2417,7 @@ git commit -m "feat: 装配主流程"
 **Files:**
 - Create: `sw.js`
 
-- [ ] **Step 1: 实现 sw.js**
+- [x] **Step 1: 实现 sw.js**
 
 ```javascript
 const CACHE = 'traebao-v1';
@@ -2495,7 +2495,7 @@ self.addEventListener('fetch', (event) => {
 });
 ```
 
-- [ ] **Step 2: 提交**
+- [x] **Step 2: 提交**
 
 ```bash
 git add sw.js
@@ -2510,7 +2510,7 @@ git commit -m "feat: 添加离线壳 Service Worker"
 - Create: `tools/mock_server.py`
 - Create: `README.md`
 
-- [ ] **Step 1: 写本地 mock 模型服务器**
+- [x] **Step 1: 写本地 mock 模型服务器**
 
 `tools/mock_server.py`：
 
@@ -2550,12 +2550,12 @@ if __name__ == "__main__":
     ThreadingHTTPServer(("127.0.0.1", 8899), Handler).serve_forever()
 ```
 
-- [ ] **Step 2: 启动静态服务与 mock 服务器**
+- [x] **Step 2: 启动静态服务与 mock 服务器**
 
 Run（后台）: `cd /workspace/traebao-pwa && python3 -m http.server 8080`
 Run（后台）: `cd /workspace/traebao-pwa && python3 tools/mock_server.py`
 
-- [ ] **Step 3: 用浏览器验证**
+- [x] **Step 3: 用浏览器验证**
 
 用 browser 打开 `http://localhost:8080/index.html`，依次验证：
 
@@ -2566,11 +2566,11 @@ Run（后台）: `cd /workspace/traebao-pwa && python3 tools/mock_server.py`
 5. 打开设置面板，记忆列表里出现「用户最近常加班到很晚」
 6. 刷新页面，重开设置，记忆仍在；聊天气泡也能回放
 
-- [ ] **Step 4: 写 README.md**
+- [x] **Step 4: 写 README.md**
 
 内容包含：项目用途、目录结构、本地开发（`npm test` / `python3 -m http.server 8080`）、部署方式（GitHub Pages / Cloudflare Pages）、模型配置说明、Worker 代理部署步骤、已知限制（Android 优先、微信内置浏览器不可安装、方舟直连可能受 CORS 限制）。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add tools/mock_server.py README.md
@@ -2581,17 +2581,17 @@ git commit -m "test: 添加本地 mock 服务器与使用说明"
 
 ### Task 17: 部署与交付
 
-- [ ] **Step 1: 确认全部测试通过**
+- [x] **Step 1: 确认全部测试通过**
 
 Run: `cd /workspace/traebao-pwa && npm test`
 Expected: PASS — 48 个用例全部通过
 
-- [ ] **Step 2: 打包交付物**
+- [x] **Step 2: 打包交付物**
 
 Run: `cd /workspace && zip -qr traebao-pwa.zip traebao-pwa -x "traebao-pwa/.git/*"`
 Expected: 生成 `/workspace/traebao-pwa.zip`
 
-- [ ] **Step 3: 最终提交**
+- [x] **Step 3: 最终提交**
 
 ```bash
 cd /workspace/traebao-pwa && git add -A && git commit -m "chore: 交付 Trae宝 PWA v1"
