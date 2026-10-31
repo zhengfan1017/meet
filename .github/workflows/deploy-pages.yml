@@ -9,8 +9,6 @@ permissions:
   contents: read
   pages: write
   id-token: write
-  # 创建 Pages 站点（首次开启时需要）要求仓库级 administration 写权限
-  administration: write
 
 concurrency:
   group: pages
