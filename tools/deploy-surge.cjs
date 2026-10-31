@@ -106,13 +106,15 @@ if (fs.existsSync(requestPath)) {
 }
 
 const makeStream = require(path.join(SURGE_HOME, "stream.js"))
-const stream = makeStream({ endpoint: "https://surge.surge.sh/", version: "0.24.7" })
+// 版本号跟着已安装的 surge CLI 走，surge 升级后不用再手动改这里
+const SURGE_VERSION = require(path.join(SURGE_HOME, "..", "..", "..", "package.json")).version
+const stream = makeStream({ endpoint: "https://surge.surge.sh/", version: SURGE_VERSION })
 
 const emitter = stream.publish(
   PROJECT,
   DOMAIN,
   { user: "token", pass: TOKEN },
-  { version: "0.24.7" },
+  { version: SURGE_VERSION },
   {}
 )
 

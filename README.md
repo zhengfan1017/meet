@@ -154,6 +154,15 @@ surge --project . --domain <你的域名>.surge.sh
 SURGE_TOKEN=<你的 token> node tools/deploy-surge.cjs <域名> .
 ```
 
+一条龙版本（浏览器登录 → 签发窄权限 token → 发布）在 `tools/surge-publish.cjs`：
+
+```bash
+node tools/surge-publish.cjs <域名> .
+```
+
+它会打印一个登录网址和 4 位 code，在浏览器里批准即可。登录会话过期会自动重开一个，
+批准后自动签发只对该域名有效的 token 并发布，不需要手动复制 token。
+
 ### Cloudflare Pages
 
 ```bash
