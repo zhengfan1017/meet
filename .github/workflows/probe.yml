@@ -1,1 +1,7 @@
-probe
+name: probe
+on: push
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo hi
