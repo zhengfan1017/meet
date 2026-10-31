@@ -5,6 +5,11 @@
   "type": "module",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "dev": "python3 -m http.server 8080"
+    "dev": "python3 -m http.server 8080",
+    "verify:live": "node tools/verify_live.js",
+    "verify:xiaomi": "node tools/verify_xiaomi_playwright.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.47.2"
   }
 }

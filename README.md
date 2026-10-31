@@ -25,7 +25,7 @@ traebao-pwa/
 ├── index.html              # 外壳：顶栏 / 舞台 / 消息区 / 输入框 / 设置面板
 ├── app.css                 # 米色纸底主题，100dvh 布局，适配刘海屏安全区
 ├── manifest.webmanifest    # PWA 清单：standalone / portrait / 192+512 图标
-├── sw.js                   # Service Worker：预缓存应用外壳，静态资源 cache-first
+├── sw.js                   # Service Worker：预缓存应用外壳，代码类资源网络优先
 ├── icons/
 │   ├── icon-192.png
 │   └── icon-512.png
@@ -47,6 +47,7 @@ traebao-pwa/
 │       ├── sse.js          # SSE 解析器
 │       ├── provider.js     # 流式请求与错误分类
 │       ├── doubao.js       # 火山方舟 OpenAI 兼容端点
+│       ├── modelProbe.js   # 模型名自动探测（404 时找出真正可用的 ID）
 │       └── worker.js       # Worker 代理端点
 ├── worker/
 │   └── worker.js           # Cloudflare Worker 源码（纯转发）
@@ -54,7 +55,9 @@ traebao-pwa/
 ├── tools/                  # 辅助脚本（mock 服务器、图标生成、端到端验收）
 │   ├── mock_server.py      # 本地假模型服务
 │   ├── verify.js           # 标准端到端验收（7 项）
-│   └── verify_xiaomi.js    # 小米浏览器场景验收（8 项）
+│   ├── verify_xiaomi.js    # 小米浏览器场景验收（8 项）
+│   ├── verify_xiaomi_playwright.js  # 小米浏览器场景验收（Playwright 版，8 项）
+│   └── verify_live.js      # 线上真实方舟端到端验收（7 项，需要 ARK_KEY）
 └── docs/superpowers/       # 设计与实施计划文档
 ```
 
@@ -92,7 +95,11 @@ python3 tools/mock_server.py    # → http://127.0.0.1:8899/chat
 | --- | --- |
 | 接口地址 | `https://ark.cn-beijing.volces.com/api/v3/chat/completions` |
 | API Key | 方舟控制台的 API Key |
-| 模型名 | 你的接入点模型，如 `doubao-seed-1-6-250615` |
+| 模型名 | 你的接入点模型 ID，如 `doubao-seed-2-1-pro-260915` |
+
+> **模型 ID 必须带日期后缀**。控制台里显示的名字（`Doubao-Seed-2-1-pro`）填进去会报
+> `InvalidEndpointOrModel.NotFound`。不确定就用设置面板里的 **「自动找模型」**，
+> 它会挨个试出当前可用的那个；发消息时遇到 404 也会自动纠正。
 
 API Key 只存在你手机的 IndexedDB 里，请求由浏览器直接发给方舟，不经过任何第三方服务器。
 
@@ -217,7 +224,17 @@ wrangler pages deploy . --project-name traebao-pwa
 
 ### 如果发不出消息
 
-小米浏览器的跨域策略和 Chrome 一致，方舟接口如果不允许浏览器直连，会提示「连不上模型」。**换 Worker 代理**即可，具体见上面的部署步骤。
+先看屏幕上那条红色横幅，它已经写明了真实原因：
+
+- **「模型名或接口地址不对（InvalidEndpointOrModel.NotFound）」** —— 模型名少了日期后缀。
+  点设置里的 **「自动找模型」**，它会挨个试出当前可用的那个并填好（保存即可）。
+  发消息时遇到 404，Trae宝 也会自己纠正并重试。
+- **「连不上模型」** —— 方舟接口不允许浏览器直连（CORS 拦截）。**换 Worker 代理**即可，
+  具体见上面的部署步骤。
+- **「API Key 不对」/「额度用完了」** —— 去方舟控制台处理。
+
+如果页面上按钮点了没反应、界面看着像旧版本（缓存把新旧代码混在一起），
+点设置面板最下面的 **「页面有问题？清缓存重载」**，它会清缓存 + 注销 Service Worker + 重载。
 
 ---
 

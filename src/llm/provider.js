@@ -1,19 +1,37 @@
 import { createSSEParser, parseSSELine } from './sse.js';
 
 export class ProviderError extends Error {
-  constructor(kind, message, status) {
+  constructor(kind, message, status, detail) {
     super(message);
     this.name = 'ProviderError';
     this.kind = kind;
     this.status = status;
+    this.detail = detail || '';
   }
 }
 
 function classifyStatus(status) {
   if (status === 401 || status === 403) return 'auth';
+  if (status === 404) return 'notfound';
   if (status === 429) return 'quota';
   if (status >= 500) return 'server';
   return 'http';
+}
+
+// 上游（方舟 / Worker）返回的错误体里有真正的原因，扒出来给用户看
+function extractDetail(raw) {
+  if (!raw) return '';
+  try {
+    const parsed = JSON.parse(raw);
+    const err = parsed && parsed.error ? parsed.error : null;
+    if (!err) return '';
+    const code = err.code ? String(err.code) : '';
+    const msg = err.message ? String(err.message) : '';
+    if (code && msg) return code + '：' + msg;
+    return code || msg;
+  } catch {
+    return '';
+  }
 }
 
 export function createProvider({
@@ -53,15 +71,17 @@ export function createProvider({
 
       if (!res.ok) {
         const kind = classifyStatus(res.status);
-        let detail = '';
-        try { detail = (await res.text()).slice(0, 300); } catch { detail = ''; }
+        let raw = '';
+        try { raw = (await res.text()).slice(0, 500); } catch { raw = ''; }
+        const detail = extractDetail(raw);
         const messages = {
           auth: 'API Key 不对，检查一下设置面板里的 Key',
+          notfound: '模型名或接口地址不对，去设置面板核对一下',
           quota: '额度用完了，去控制台充值或换个模型',
           server: '模型服务出错了，稍后再试',
           http: `请求失败（${res.status}）`,
         };
-        throw new ProviderError(kind, messages[kind] || '请求失败', res.status);
+        throw new ProviderError(kind, messages[kind] || '请求失败', res.status, detail);
       }
 
       const reader = res.body.getReader();

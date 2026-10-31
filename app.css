@@ -224,6 +224,23 @@ html, body {
 }
 .settings-card .primary { background: var(--accent); color: #fff; border: 0; margin-top: 16px; width: 100%; }
 .settings-card .danger { background: #fde8df; color: #8a3b1c; border: 0; margin-top: 16px; width: 100%; }
+.settings-card .link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  text-decoration: underline;
+  margin-top: 8px;
+}
+.settings-card .link:disabled { opacity: .5; }
+
+/* 并排放两个次级按钮（测试连接 / 自动找模型） */
+.btn-row {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+.btn-row .link { margin-top: 0; margin-right: 16px; }
 
 .memory-list { display: flex; flex-direction: column; }
 .memory-list .memory-row + .memory-row { margin-top: 8px; }

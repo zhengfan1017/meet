@@ -1,7 +1,7 @@
 import { createProvider } from './provider.js';
 
 export const DEFAULT_ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions';
-export const DEFAULT_MODEL = 'doubao-seed-1-6-250615';
+export const DEFAULT_MODEL = 'doubao-seed-2-1-pro-260915';
 
 export function createDoubaoProvider({
   endpoint = DEFAULT_ENDPOINT,

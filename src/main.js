@@ -6,8 +6,9 @@ import { createDefaultStore } from './memory/store.js';
 import { buildContext } from './memory/retriever.js';
 import { extractTags, stripMarkers } from './memory/extractor.js';
 import { buildSystemPrompt } from './llm/prompt.js';
-import { createDoubaoProvider } from './llm/doubao.js';
+import { createDoubaoProvider, DEFAULT_ENDPOINT, DEFAULT_MODEL } from './llm/doubao.js';
 import { createWorkerProvider } from './llm/worker.js';
+import { findWorkingModel } from './llm/modelProbe.js';
 
 const stage = createStage(document.getElementById('stage'));
 const timeline = createTimeline(document.getElementById('timeline'));
@@ -39,7 +40,7 @@ async function buildProvider() {
     return createWorkerProvider({
       workerUrl: await store.getKV('workerUrl'),
       accessToken: await store.getKV('accessToken'),
-      model: (await store.getKV('model')) || 'doubao-seed-1-6-250615',
+      model: (await store.getKV('model')) || DEFAULT_MODEL,
     });
   }
   return createDoubaoProvider({
@@ -53,10 +54,25 @@ const ERROR_HINTS = {
   network: '连不上模型。如果是跨域被拦，去设置里换成 Worker 代理。',
   interrupted: '断了，可以再发一次。',
   auth: 'API Key 不对，去设置面板改一下。',
+  notfound: '模型名或接口地址不对，去设置面板点「自动找模型」。',
   quota: '额度用完了，去控制台充值。',
   server: '模型服务出错了，稍后再试。',
   timeout: '请求超时了，再试一次。',
 };
+
+// 方舟的模型 ID 必须带日期后缀，控制台上显示的名字直接填进去必然 404。
+// 这是最高频的故障，所以不只报错，而是自动找一个真能用的模型名改过来。
+async function autoFixModel() {
+  const endpoint = (await store.getKV('endpoint')) || DEFAULT_ENDPOINT;
+  const apiKey = await store.getKV('apiKey');
+  if (!apiKey) return null;
+  const current = await store.getKV('model');
+  const found = await findWorkingModel({ endpoint, apiKey, model: current });
+  if (!found || found === current) return null;
+  await store.setKV('model', found);
+  if (settings) settings.setModel(found);
+  return found;
+}
 
 async function runStream(bubble, ctx) {
   const provider = await buildProvider();
@@ -78,6 +94,17 @@ async function runStream(bubble, ctx) {
     stage.stopStreaming();
   }
   return raw;
+}
+
+function failWith(bubble, err, raw) {
+  const kind = err && err.kind ? err.kind : 'unknown';
+  const hint = ERROR_HINTS[kind] || '出了点问题，再试一次。';
+  const detail = err && err.detail ? err.detail : '';
+  showBanner(detail ? hint + '（' + detail + '）' : hint);
+  const partial = extractTags(raw).content.trim();
+  timeline.setBubbleText(bubble, partial || '（这次没能说完）');
+  busy = false;
+  composer.setDisabled(false);
 }
 
 async function handleSend(text) {
@@ -114,13 +141,25 @@ async function handleSend(text) {
       raw = await runStream(bubble, ctx);
     }
   } catch (err) {
-    const kind = err && err.kind ? err.kind : 'unknown';
-    showBanner(ERROR_HINTS[kind] || '出了点问题，再试一次。');
-    const partial = extractTags(raw).content.trim();
-    timeline.setBubbleText(bubble, partial || '（这次没能说完）');
-    busy = false;
-    composer.setDisabled(false);
-    return;
+    // 模型名写错 → 自动换一个能用的模型再试一次，用户不用手动改
+    if (err && err.kind === 'notfound' && mode === 'direct') {
+      const fixed = await autoFixModel();
+      if (fixed) {
+        showBanner('模型名不对，已自动切换到 ' + fixed);
+        try {
+          raw = await runStream(bubble, ctx);
+        } catch (err2) {
+          failWith(bubble, err2, raw);
+          return;
+        }
+      } else {
+        failWith(bubble, err, raw);
+        return;
+      }
+    } else {
+      failWith(bubble, err, raw);
+      return;
+    }
   }
 
   if (raw.trim() === '') {
@@ -213,12 +252,6 @@ if (isStandalone()) {
   setTimeout(() => {
     if (!deferredPrompt && !isStandalone()) showManualTip();
   }, 1500);
-}
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => { /* 本地 file:// 打开时会失败，忽略 */ });
-  });
 }
 
 async function boot() {

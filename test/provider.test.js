@@ -75,6 +75,39 @@ test('401 归类为 auth 错误', async () => {
   );
 });
 
+test('404 归类为 notfound 错误（模型名写错）', async () => {
+  const provider = createProvider({
+    endpoint: 'https://example.test/chat', apiKey: 'k', model: 'bad-model',
+    fetchImpl: fakeFetch([], { ok: false, status: 404 }),
+  });
+  await assert.rejects(
+    async () => { for await (const _ of provider.stream({ system: 'S', messages: [] })) { /* noop */ } },
+    (err) => err instanceof ProviderError && err.kind === 'notfound',
+  );
+});
+
+test('错误详情带出上游的 code 与 message', async () => {
+  const body = JSON.stringify({
+    error: { code: 'InvalidEndpointOrModel.NotFound', message: 'The model bad-model does not exist' },
+  });
+  const provider = createProvider({
+    endpoint: 'https://example.test/chat', apiKey: 'k', model: 'bad-model',
+    fetchImpl: async () => ({
+      ok: false, status: 404,
+      headers: { get: () => 'application/json' },
+      text: async () => body,
+      body: { getReader: () => ({ async read() { return { done: true }; } }) },
+    }),
+  });
+  await assert.rejects(
+    async () => { for await (const _ of provider.stream({ system: 'S', messages: [] })) { /* noop */ } },
+    (err) => err instanceof ProviderError
+      && err.kind === 'notfound'
+      && err.detail.includes('InvalidEndpointOrModel.NotFound')
+      && err.detail.includes('does not exist'),
+  );
+});
+
 test('429 归类为 quota 错误', async () => {
   const provider = createProvider({
     endpoint: 'https://example.test/chat', apiKey: 'k', model: 'm1',

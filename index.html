@@ -42,7 +42,22 @@
       <div id="directBox">
         <label>接口地址<input name="endpoint" type="url" placeholder="https://ark.cn-beijing.volces.com/api/v3/chat/completions" /></label>
         <label>API Key<span class="inline"><input name="apiKey" type="password" /><button type="button" id="toggleKey">显示</button></span></label>
-        <label>模型名<input name="model" type="text" placeholder="doubao-seed-1-6-250615" /></label>
+        <label>模型名<span class="inline"><input name="model" type="text" list="modelOptions" placeholder="doubao-seed-2-1-pro-260915" /></span>
+          <span class="muted">模型 ID 要带日期后缀。不确定就别手填，点下面「自动找模型」让它自己找。</span>
+        </label>
+        <datalist id="modelOptions">
+          <option value="doubao-seed-2-1-pro-260915"></option>
+          <option value="doubao-seed-2-1-pro-260628"></option>
+          <option value="doubao-seed-2-1-turbo-260628"></option>
+          <option value="doubao-seed-2-1-lite-260915"></option>
+          <option value="doubao-seed-2-0-lite-260428"></option>
+          <option value="doubao-seed-2-0-mini-260428"></option>
+        </datalist>
+        <div class="btn-row">
+          <button type="button" id="testConn" class="link">测试连接</button>
+          <button type="button" id="autoModel" class="link">自动找模型</button>
+        </div>
+        <span id="modelHint" class="muted"></span>
       </div>
 
       <div id="workerBox" hidden>
@@ -54,11 +69,27 @@
       <div id="memoryList" class="memory-list"></div>
 
       <button type="button" id="clearAll" class="danger">清除所有数据</button>
+      <button type="button" id="repairApp" class="link">页面有问题？清缓存重载</button>
       <button type="submit" class="primary">保存</button>
     </form>
   </div>
 </div>
 
+<script>
+// 注册 Service Worker。
+//
+// 这里用带版本号的地址（sw.js?v=7），而不是直接写 sw.js：
+// 地址变了浏览器就会当成一次全新的注册去下载安装，
+// 哪怕手机里装的是很老的版本，也能被换掉。
+// 放在 HTML 里而不是 main.js 里，是因为 HTML 走网络优先，
+// 每次拿到的都是最新的这段代码，不会被旧版 JS 挡住。
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js?v=7', { updateViaCache: 'none' })
+      .catch(function () { /* 本地 file:// 打开时会失败，忽略 */ });
+  });
+}
+</script>
 <script type="module" src="src/main.js"></script>
 </body>
 </html>
