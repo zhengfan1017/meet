@@ -130,6 +130,15 @@ git push origin main
 # 仓库 Settings → Pages → Source 选 main 分支根目录
 ```
 
+### Surge.sh（当前线上用的就是它）
+
+```bash
+npm install -g surge
+surge --project . --domain <你的域名>.surge.sh
+```
+
+首次需要注册账号并**验证邮箱**，否则发布会失败（`Error - Deployment did not succeed.`）。
+
 ### Cloudflare Pages
 
 ```bash
@@ -161,6 +170,10 @@ wrangler pages deploy . --project-name traebao-pwa
 ---
 
 ## 在小米浏览器上使用
+
+**线上地址：https://traebao-app.surge.sh/**
+
+第一次用的话，直接看 **[小米浏览器从零安装使用手册](docs/小米浏览器安装使用手册.md)**，那是从「还没下载过」开始写的完整流程。
 
 小米浏览器（Mi Browser）是 Chromium 内核，可以正常使用。**但它不触发 `beforeinstallprompt`**，所以页面里的「添加到桌面」按钮不会出现 —— 需要手动从浏览器菜单添加。
 
