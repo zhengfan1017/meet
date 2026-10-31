@@ -1,0 +1,59 @@
+name: surge 发布
+
+# surge 的浏览器登录会话只有 10 分钟有效，手工发链接总会过期。
+# 这个任务常驻跑：不断开新会话、把新鲜链接写进 issue #1，你点一下登录，
+# 批准之后任务自动发布 traebao-app.surge.sh，并把 token 缓存起来。
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/surge-auto-login.cjs'
+      - '.github/workflows/surge-publish.yml'
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: surge-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 安装 surge
+        run: npm install -g surge
+
+      - name: 恢复已保存的 token
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/surge-token.txt
+          key: surge-token-v1
+
+      - name: 登录并发布
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SURGE_DOMAIN: traebao-app.surge.sh
+          SURGE_TOKEN_FILE: ${{ runner.temp }}/surge-token.txt
+        run: node tools/surge-auto-login.cjs
+
+      - name: 保存 token
+        if: always()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/surge-token.txt
+          key: surge-token-v1
