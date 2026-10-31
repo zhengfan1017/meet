@@ -34,7 +34,7 @@ test('图片类资源缓存优先、网络兜底', () => {
 test('缓存版本号会随发布递增', () => {
   const m = sw.match(/const CACHE = 'traebao-v(\d+)'/);
   assert.ok(m, 'sw.js 里应有可识别的 CACHE 版本号');
-  assert.ok(Number(m[1]) >= 7, 'CACHE 版本号应已升级到 v7 或更高');
+  assert.ok(Number(m[1]) >= 8, 'CACHE 版本号应已升级到 v8 或更高');
 });
 
 test('旧版本缓存会在激活时被清掉', () => {
@@ -53,7 +53,7 @@ test('Service Worker 用版本化地址注册，旧手机也刷得到新版', ()
   // 浏览器可能不重新拉。加 ?v=N 让地址变化，强制当成全新注册。
   const m = html.match(/serviceWorker\.register\('sw\.js\?v=(\d+)'/);
   assert.ok(m, 'index.html 里应有用 sw.js?v=N 的版本化注册');
-  assert.ok(Number(m[1]) >= 7, '注册地址的版本号应与 SW 版本一致');
+  assert.ok(Number(m[1]) >= 8, '注册地址的版本号应与 SW 版本一致');
 
   // 注册脚本必须在 index.html 内联，不能放在 main.js 里
   // （main.js 会被旧版缓存挡住，注册代码就换不成了）
@@ -62,4 +62,12 @@ test('Service Worker 用版本化地址注册，旧手机也刷得到新版', ()
   // main.js 里不应该再有注册代码
   const main = readFileSync(new URL('../src/main.js', import.meta.url).pathname, 'utf8');
   assert.doesNotMatch(main, /serviceWorker\.register/);
+});
+
+test('sw.js 的缓存版本号与注册地址的版本号必须一致', () => {
+  // 两处版本号只要有一个忘了改，手机上就会拿到「新页面 + 旧缓存」。
+  // 图片是缓存优先的，改了图标更必须升版本号，否则手机上还是旧图标。
+  const cacheV = sw.match(/const CACHE = 'traebao-v(\d+)'/)[1];
+  const regV = html.match(/serviceWorker\.register\('sw\.js\?v=(\d+)'/)[1];
+  assert.equal(regV, cacheV, `注册地址是 v${regV}，但缓存是 v${cacheV}，两个版本号对不上`);
 });

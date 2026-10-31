@@ -27,8 +27,9 @@ traebao-pwa/
 ├── manifest.webmanifest    # PWA 清单：standalone / portrait / 192+512 图标
 ├── sw.js                   # Service Worker：预缓存应用外壳，代码类资源网络优先
 ├── icons/
-│   ├── icon-192.png
-│   └── icon-512.png
+│   ├── icon-192.png         # 桌面图标 192×192
+│   ├── icon-512.png         # 桌面图标 512×512
+│   └── trae-robot-green.png # 绿色机器人立绘（透明底，可任意叠放）
 ├── src/
 │   ├── main.js             # 应用装配：发送 → 组上下文 → 流式渲染 → 写回记忆
 │   ├── mood.js             # 8 种情绪标签 → 表情图片映射

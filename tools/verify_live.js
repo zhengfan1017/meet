@@ -49,14 +49,14 @@ async function main() {
   await page.goto(APP_URL, { waitUntil: 'networkidle' });
   await sleep(2500);
 
-  // 1. SW 已升到 v7，且旧缓存被清掉
+  // 1. SW 已升到 v8，且旧缓存被清掉
   const swState = await page.evaluate(async () => {
     const regs = await navigator.serviceWorker.getRegistrations();
     const keys = await caches.keys();
     return { regs: regs.length, keys };
   });
-  check('1. Service Worker 已注册，缓存只有 traebao-v7',
-    swState.regs > 0 && swState.keys.length === 1 && swState.keys[0] === 'traebao-v7',
+  check('1. Service Worker 已注册，缓存只有 traebao-v8',
+    swState.regs > 0 && swState.keys.length === 1 && swState.keys[0] === 'traebao-v8',
     JSON.stringify(swState));
 
   // 2. 填错模型名 → 测试连接应报 404 + 上游错误码
