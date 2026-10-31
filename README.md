@@ -52,6 +52,9 @@ traebao-pwa/
 │   └── worker.js           # Cloudflare Worker 源码（纯转发）
 ├── test/                   # Node 内置测试，零依赖
 ├── tools/                  # 辅助脚本（mock 服务器、图标生成、端到端验收）
+│   ├── mock_server.py      # 本地假模型服务
+│   ├── verify.js           # 标准端到端验收（7 项）
+│   └── verify_xiaomi.js    # 小米浏览器场景验收（8 项）
 └── docs/superpowers/       # 设计与实施计划文档
 ```
 
@@ -157,9 +160,52 @@ wrangler pages deploy . --project-name traebao-pwa
 
 ---
 
+## 在小米浏览器上使用
+
+小米浏览器（Mi Browser）是 Chromium 内核，可以正常使用。**但它不触发 `beforeinstallprompt`**，所以页面里的「添加到桌面」按钮不会出现 —— 需要手动从浏览器菜单添加。
+
+### 添加到桌面步骤
+
+1. 用小米浏览器打开站点地址
+2. 点底部或顶部的 **≡ / ⋮ 菜单按钮**
+3. 选 **「添加到桌面」**（部分版本叫「新建快捷方式」「添加书签到桌面」）
+4. 名字改成「Trae宝」，确认
+
+桌面会出现图标，点开即用。
+
+### 小米浏览器的两点差异
+
+| | Chrome / Edge | 小米浏览器 |
+| --- | --- | --- |
+| 安装入口 | 页面内一键按钮 | 只能走浏览器菜单 |
+| 独立窗口 | 完整 standalone | 多数版本带顶部地址栏（MIUI 13+ 更接近独立窗口） |
+| 触发 `beforeinstallprompt` | 是 | 否 |
+
+因为不支持 `beforeinstallprompt`，页面底部会显示一行文字提示「用浏览器菜单里的『添加到桌面 / 新建快捷方式』」，就是引导你走上面这四步。
+
+### 兼容性
+
+针对小米浏览器的存量设备（MIUI 12 时代，Chromium 71~87）做了降级：
+
+- 不用顶层 `await`（Chrome 89+）—— 改成 `boot()` 引导函数，否则整个模块解析失败、页面白屏
+- `structuredClone`（Chrome 98+）—— 降级为 JSON 深拷贝
+- 可选链 `?.` / 空值合并 `??`（Chrome 80+）—— 全部改写成普通条件判断
+- `String.matchAll`（Chrome 73+）—— 改用 `exec` 循环
+- `100dvh`（Chrome 108+）—— 加 `100vh` 兜底
+- flex `gap`（Chrome 84+）—— 改用 `margin`
+
+这些约束由 `test/compat.test.js` 自动守卫，以后引入新语法会被测试挡下。
+
+### 如果发不出消息
+
+小米浏览器的跨域策略和 Chrome 一致，方舟接口如果不允许浏览器直连，会提示「连不上模型」。**换 Worker 代理**即可，具体见上面的部署步骤。
+
+---
+
 ## 已知限制
 
 - **Android 优先**：iOS Safari 的「添加到主屏幕」体验弱一些（无安装引导按钮，需手动分享菜单添加）
+- **小米浏览器无一键安装**：不触发 `beforeinstallprompt`，需从浏览器菜单手动添加，详见上面的专章
 - **微信内置浏览器装不了**：微信里打开的页面是 WebView，不能安装 PWA。请用系统浏览器打开后再添加到桌面
 - **方舟直连可能受 CORS 限制**：被跨域拦截时换 Worker 代理
 - **没有多设备同步**：数据在本地，换手机不会跟着走

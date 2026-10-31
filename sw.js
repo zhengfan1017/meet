@@ -1,4 +1,4 @@
-const CACHE = 'traebao-v1';
+const CACHE = 'traebao-v3';
 
 const SHELL = [
   './',
@@ -63,11 +63,31 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.includes('/api/') || url.hostname.endsWith('volces.com')) return;
 
+  // 页面导航走「网络优先」：联网时总能拿到最新版本，断网才回落到缓存
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match('./index.html').then((hit) => hit || Response.error())),
+    );
+    return;
+  }
+
+  // 静态资源走「缓存优先 + 后台更新」：秒开，同时悄悄换新
   event.respondWith(
-    caches.match(req).then((hit) => hit || fetch(req).then((res) => {
-      const copy = res.clone();
-      caches.open(CACHE).then((cache) => cache.put(req, copy));
-      return res;
-    }).catch(() => caches.match('./index.html'))),
+    caches.match(req).then((hit) => {
+      const fresh = fetch(req).then((res) => {
+        if (res && res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(req, copy));
+        }
+        return res;
+      }).catch(() => null);
+      return hit || fresh.then((res) => res || Response.error());
+    }),
   );
 });

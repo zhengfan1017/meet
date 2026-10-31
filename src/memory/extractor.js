@@ -5,7 +5,14 @@ const MEM_MAX_LEN = 30;
 
 export function extractTags(raw) {
   const text = typeof raw === 'string' ? raw : '';
-  const matches = [...text.matchAll(MARKER_RE)];
+  // 用 exec 循环代替 matchAll，兼容老版本 Chromium（matchAll 需 Chrome 73+）
+  const matches = [];
+  MARKER_RE.lastIndex = 0;
+  let m = MARKER_RE.exec(text);
+  while (m !== null) {
+    matches.push(m);
+    m = MARKER_RE.exec(text);
+  }
   if (matches.length === 0) {
     return { content: text.trim(), emo: null, memories: [] };
   }

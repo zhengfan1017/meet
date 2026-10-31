@@ -17,7 +17,8 @@ export function createStage(root) {
     img.dataset.emo = emo;
     img.src = spritePath(emo, 'gif');
     img.onerror = () => { img.src = spritePath(emo, 'png'); };
-    root.setAttribute('aria-label', EMO_SPRITE[emo]?.desc || '');
+    const meta = EMO_SPRITE[emo];
+    root.setAttribute('aria-label', (meta && meta.desc) || '');
   }
 
   function setEmotion(emo, { force = false } = {}) {

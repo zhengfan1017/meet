@@ -1,18 +1,24 @@
 const STORES = ['sessions', 'messages', 'memories', 'kv'];
 
+// 老版本 Chromium（小米浏览器 MIUI 12 时代）没有 structuredClone，用 JSON 兜底
+const clone = typeof structuredClone === 'function'
+  ? structuredClone
+  : (v) => JSON.parse(JSON.stringify(v));
+
 export function createMemoryBackend() {
-  const data = Object.fromEntries(STORES.map((s) => [s, new Map()]));
+  const data = {};
+  for (const s of STORES) data[s] = new Map();
   return {
     async init() {},
     async put(store, record) {
-      data[store].set(record.id, structuredClone(record));
+      data[store].set(record.id, clone(record));
     },
     async get(store, id) {
       const rec = data[store].get(id);
-      return rec ? structuredClone(rec) : null;
+      return rec ? clone(rec) : null;
     },
     async all(store) {
-      return [...data[store].values()].map((r) => structuredClone(r));
+      return [...data[store].values()].map((r) => clone(r));
     },
     async delete(store, id) {
       data[store].delete(id);

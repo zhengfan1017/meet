@@ -72,7 +72,10 @@ export function createProvider({
       const handle = (line) => {
         const data = parseSSELine(line);
         if (data === null || data === 'DONE') return data;
-        const delta = data?.choices?.[0]?.delta?.content;
+        // 不用可选链，老版本 Chromium（小米浏览器）解析不了会整块报错
+        const choices = data.choices;
+        const choice = Array.isArray(choices) ? choices[0] : null;
+        const delta = choice && choice.delta ? choice.delta.content : undefined;
         return typeof delta === 'string' ? delta : null;
       };
 
