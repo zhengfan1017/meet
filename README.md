@@ -139,6 +139,12 @@ surge --project . --domain <你的域名>.surge.sh
 
 首次需要注册账号并**验证邮箱**，否则发布会失败（`Error - Deployment did not succeed.`）。
 
+沙箱环境里还有两个坑（原生 `https.request` 不认代理环境变量），用 `tools/deploy-surge.cjs` 可以绕开：
+
+```bash
+SURGE_TOKEN=<你的 token> node tools/deploy-surge.cjs <域名> .
+```
+
 ### Cloudflare Pages
 
 ```bash
