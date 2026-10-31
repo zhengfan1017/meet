@@ -55,6 +55,7 @@ traebao-pwa/
 ├── test/                   # Node 内置测试，零依赖
 ├── tools/                  # 辅助脚本（mock 服务器、图标生成、端到端验收）
 │   ├── mock_server.py      # 本地假模型服务
+│   ├── make_icon_from_photo.py  # 从实物照片抠图生成桌面图标
 │   ├── verify.js           # 标准端到端验收（7 项）
 │   ├── verify_xiaomi.js    # 小米浏览器场景验收（8 项）
 │   ├── verify_xiaomi_playwright.js  # 小米浏览器场景验收（Playwright 版，8 项）

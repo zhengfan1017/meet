@@ -55,8 +55,8 @@ async function main() {
     const keys = await caches.keys();
     return { regs: regs.length, keys };
   });
-  check('1. Service Worker 已注册，缓存只有 traebao-v8',
-    swState.regs > 0 && swState.keys.length === 1 && swState.keys[0] === 'traebao-v8',
+  check('1. Service Worker 已注册，缓存只有 traebao-v9',
+    swState.regs > 0 && swState.keys.length === 1 && swState.keys[0] === 'traebao-v9',
     JSON.stringify(swState));
 
   // 2. 填错模型名 → 测试连接应报 404 + 上游错误码

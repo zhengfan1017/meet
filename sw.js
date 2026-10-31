@@ -13,12 +13,12 @@
 //
 // 顺带解决「用户手机上装的是旧版本、永远刷不到新版」：
 //   · index.html 里有一段内联脚本，用带版本号的地址注册 sw.js
-//     （sw.js?v=8）。地址变了浏览器就会当成新注册去装，
+//     （sw.js?v=9）。地址变了浏览器就会当成新注册去装，
 //     不管 HTML 里引用的 main.js 是不是旧的。
 //   · index.html 在旧版 SW 下也是网络优先，所以这段内联脚本
 //     每次拿到的都是最新的。
 
-const CACHE = 'traebao-v8';
+const CACHE = 'traebao-v9';
 
 // 离线时要用到的全部文件
 const SHELL = [
