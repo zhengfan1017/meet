@@ -13,6 +13,12 @@ on:
     paths:
       - 'tools/surge-auto-login.cjs'
       - '.github/workflows/surge-publish.yml'
+      - 'index.html'
+      - 'app.css'
+      - 'manifest.webmanifest'
+      - 'sw.js'
+      - 'src/**'
+      - 'icons/**'
 
 permissions:
   contents: write

@@ -52,6 +52,8 @@ function sleep(ms) {
 }
 
 // 轮询直到批准 / 过期；期间每 8 分钟重开一个新会话，保证链接新鲜
+let lastUrl = ""
+
 async function waitForApproval() {
   const hardDeadline = Date.now() + RUN_MINUTES * 60 * 1000
   while (Date.now() < hardDeadline) {
@@ -63,10 +65,11 @@ async function waitForApproval() {
     }
     const deadline = Date.now() + Math.min(9.5 * 60 * 1000, hardDeadline - Date.now())
     log("新会话：", session.url)
+    lastUrl = session.url
     await upsertComment(
       `🔗 **点这个链接登录 Surge**（10 分钟内有效，页面上没有 code 框，只填邮箱+密码，或点 Continue with Google / GitHub）\n\n` +
         `<${session.url}>\n\n` +
-        `登录后本任务会自动发布 v9。当前时间 ${new Date().toLocaleString("zh-CN")}`
+        `登录后本任务会自动发布。当前时间 ${new Date().toLocaleString("zh-CN")}`
     )
     while (Date.now() < deadline) {
       await sleep((session.interval || 2) * 1000)
@@ -181,7 +184,12 @@ async function main() {
   const approved = await waitForApproval()
   if (!approved) {
     log("本轮没等到批准")
-    await upsertComment("⏳ 还没等到登录批准，本轮结束。点上面那条链接重新登录即可。")
+    // 别把链接冲掉：轮次结束时评论里还得留着可点的链接
+    await upsertComment(
+      "⏳ 本轮没等到登录批准。下面这条链接仍然可以点，登录后本任务会自动发布。\n\n" +
+        (lastUrl ? `<${lastUrl}>\n\n` : "") +
+        `当前时间 ${new Date().toLocaleString("zh-CN")}`
+    )
     return
   }
 
