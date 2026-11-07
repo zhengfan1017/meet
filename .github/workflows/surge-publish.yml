@@ -31,7 +31,9 @@ permissions:
 
 concurrency:
   group: surge-publish
-  cancel-in-progress: false
+  # 新 push 直接接管：旧 run 反正只在等登录批准，
+  # 掐掉重开能立刻拿到新鲜的登录链接，不用排队等上一轮超时。
+  cancel-in-progress: true
 
 jobs:
   publish:
