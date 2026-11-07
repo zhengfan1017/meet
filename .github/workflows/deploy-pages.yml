@@ -30,6 +30,7 @@ jobs:
           cp index.html app.css manifest.webmanifest sw.js site/
           cp -r src site/src
           cp -r icons site/icons
+          rm -rf site/icons/source   # 图标源图只有生成脚本用得上，不上线
           ls -R site | head -40
 
       - name: Configure Pages

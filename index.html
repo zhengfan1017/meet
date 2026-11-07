@@ -78,14 +78,14 @@
 <script>
 // 注册 Service Worker。
 //
-// 这里用带版本号的地址（sw.js?v=9），而不是直接写 sw.js：
+// 这里用带版本号的地址（sw.js?v=10），而不是直接写 sw.js：
 // 地址变了浏览器就会当成一次全新的注册去下载安装，
 // 哪怕手机里装的是很老的版本，也能被换掉。
 // 放在 HTML 里而不是 main.js 里，是因为 HTML 走网络优先，
 // 每次拿到的都是最新的这段代码，不会被旧版 JS 挡住。
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=9', { updateViaCache: 'none' })
+    navigator.serviceWorker.register('sw.js?v=10', { updateViaCache: 'none' })
       .catch(function () { /* 本地 file:// 打开时会失败，忽略 */ });
   });
 }

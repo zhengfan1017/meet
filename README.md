@@ -27,9 +27,11 @@ traebao-pwa/
 ├── manifest.webmanifest    # PWA 清单：standalone / portrait / 192+512 图标
 ├── sw.js                   # Service Worker：预缓存应用外壳，代码类资源网络优先
 ├── icons/
-│   ├── icon-192.png         # 桌面图标 192×192
-│   ├── icon-512.png         # 桌面图标 512×512
-│   └── trae-robot-green.png # 绿色机器人立绘（透明底，可任意叠放）
+│   ├── icon-192.png           # 桌面图标 192×192
+│   ├── icon-512.png           # 桌面图标 512×512
+│   ├── icon-maskable-512.png  # 可遮罩图标（Android 自适应圆角裁切用）
+│   ├── trae-robot-green.png   # 绿色机器人立绘（透明底，可任意叠放）
+│   └── source/robot-cute.jpg  # 图标源渲染图（只用于重新生成图标，不上线）
 ├── src/
 │   ├── main.js             # 应用装配：发送 → 组上下文 → 流式渲染 → 写回记忆
 │   ├── mood.js             # 8 种情绪标签 → 表情图片映射
@@ -55,7 +57,7 @@ traebao-pwa/
 ├── test/                   # Node 内置测试，零依赖
 ├── tools/                  # 辅助脚本（mock 服务器、图标生成、端到端验收）
 │   ├── mock_server.py      # 本地假模型服务
-│   ├── make_icon_from_photo.py  # 从实物照片抠图生成桌面图标
+│   ├── make_icons.py       # 从可爱机器人渲染图抠图生成全套桌面图标
 │   ├── verify.js           # 标准端到端验收（7 项）
 │   ├── verify_xiaomi.js    # 小米浏览器场景验收（8 项）
 │   ├── verify_xiaomi_playwright.js  # 小米浏览器场景验收（Playwright 版，8 项）

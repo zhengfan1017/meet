@@ -1,2 +1,5 @@
 # 登录 token 绝不能传到公网
 surge-token.txt
+
+# 图标源图（只有生成脚本用得上，线上不需要）
+icons/source
