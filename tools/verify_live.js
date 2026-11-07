@@ -2,7 +2,7 @@
 // 用法：node tools/verify_live.js
 import { chromium } from 'playwright';
 
-const APP_URL = 'https://traebao-app.surge.sh/';
+const APP_URL = 'https://traebao-app-2.surge.sh/';
 const ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions';
 const API_KEY = process.env.ARK_KEY || '';
 const BAD_MODEL = 'Doubao-Seed-2-1-pro';   // 用户截图里填的那个（缺日期后缀，必然 404）

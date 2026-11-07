@@ -1,3 +1,7 @@
 node_modules/
 .DS_Store
 *.log
+
+# surge 登录凭证，绝不能进 git
+surge-token.txt
+.surge-token

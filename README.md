@@ -55,9 +55,11 @@ traebao-pwa/
 ├── worker/
 │   └── worker.js           # Cloudflare Worker 源码（纯转发）
 ├── test/                   # Node 内置测试，零依赖
-├── tools/                  # 辅助脚本（mock 服务器、图标生成、端到端验收）
+├── tools/                  # 辅助脚本（mock 服务器、图标生成、发布、端到端验收）
 │   ├── mock_server.py      # 本地假模型服务
 │   ├── make_icons.py       # 从可爱机器人渲染图抠图生成全套桌面图标
+│   ├── publish.cjs         # 一键发布到 surge（token 读 surge-token.txt）
+│   ├── deploy-surge.cjs    # 底层发布实现（绕开代理限制）
 │   ├── verify.js           # 标准端到端验收（7 项）
 │   ├── verify_xiaomi.js    # 小米浏览器场景验收（8 项）
 │   ├── verify_xiaomi_playwright.js  # 小米浏览器场景验收（Playwright 版，8 项）
@@ -143,27 +145,34 @@ git push origin main
 
 ### Surge.sh（当前线上用的就是它）
 
+线上地址：**https://traebao-app-2.surge.sh/**
+
+登录一次拿到 token 存进 `surge-token.txt`（已被 `.gitignore` 排除，不会传到公网）：
+
 ```bash
-npm install -g surge
-surge --project . --domain <你的域名>.surge.sh
+surge login                    # 浏览器里用 GitHub / Google 授权，不用记密码
+surge token                    # 打印 token，粘进 surge-token.txt
 ```
 
-首次需要注册账号并**验证邮箱**，否则发布会失败（`Error - Deployment did not succeed.`）。
+之后一条命令发布：
 
-沙箱环境里还有两个坑（原生 `https.request` 不认代理环境变量），用 `tools/deploy-surge.cjs` 可以绕开：
+```bash
+node tools/publish.cjs          # 默认发到 traebao-app-2.surge.sh
+node tools/publish.cjs <域名>    # 换域名
+```
+
+沙箱环境里有个坑（原生 `https.request` 不认代理环境变量），`tools/publish.cjs` 内部调用的
+`tools/deploy-surge.cjs` 已经绕开了：
 
 ```bash
 SURGE_TOKEN=<你的 token> node tools/deploy-surge.cjs <域名> .
 ```
 
-一条龙版本（浏览器登录 → 签发窄权限 token → 发布）在 `tools/surge-publish.cjs`：
+> **域名一旦发布就绑在那个 surge 账号上**，换账号发布会返回
+> `account does not have access to domain`。所以账号和域名要一起换，别只换一边。
 
-```bash
-node tools/surge-publish.cjs <域名> .
-```
-
-它会打印一个登录网址和 4 位 code，在浏览器里批准即可。登录会话过期会自动重开一个，
-批准后自动签发只对该域名有效的 token 并发布，不需要手动复制 token。
+CI 自动发布用 `.github/workflows/surge-publish.yml`：它每小时开一个新的 surge 登录会话，
+把链接写进 issue #1，批准后自动发布并把 token 缓存起来（之后就不再需要登录）。
 
 ### Cloudflare Pages
 
@@ -197,7 +206,7 @@ wrangler pages deploy . --project-name traebao-pwa
 
 ## 在小米浏览器上使用
 
-**线上地址：https://traebao-app.surge.sh/**
+**线上地址：https://traebao-app-2.surge.sh/**
 
 第一次用的话，直接看 **[小米浏览器从零安装使用手册](docs/小米浏览器安装使用手册.md)**，那是从「还没下载过」开始写的完整流程。
 

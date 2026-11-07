@@ -1,19 +1,19 @@
 // 在 GitHub Actions 里常驻运行：开一个 surge 浏览器登录会话，把链接写进 issue，
-// 等你批准后自动发布 traebao-app.surge.sh。
+// 等你批准后自动发布 traebao-app-2.surge.sh。
 //
 // 为什么要这套东西：surge 的浏览器登录会话只有 10 分钟有效期，手工发链接
 // 总会过期。放在 Actions 里循环开新会话，issue 上的链接永远是新鲜的，
 // 而且批准之后 token 会缓存下来，之后再发布不需要再登录。
 //
 // 用法（本地也能跑）：
-//   GITHUB_TOKEN=<github token> SURGE_DOMAIN=traebao-app.surge.sh node tools/surge-auto-login.cjs
+//   GITHUB_TOKEN=<github token> SURGE_DOMAIN=traebao-app-2.surge.sh node tools/surge-auto-login.cjs
 
 const fs = require("fs")
 const os = require("os")
 const path = require("path")
 const { spawn } = require("child_process")
 
-const DOMAIN = process.env.SURGE_DOMAIN || "traebao-app.surge.sh"
+const DOMAIN = process.env.SURGE_DOMAIN || "traebao-app-2.surge.sh"
 const ENDPOINT = "https://surge.surge.sh/"
 const REPO = process.env.GITHUB_REPOSITORY || "zhengfan1017/meet"
 const GH_TOKEN = process.env.GITHUB_TOKEN
