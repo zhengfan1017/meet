@@ -132,18 +132,22 @@ async function upsertComment(body) {
 
 // ---------- 发布 ----------
 
+// 复用 tools/deploy-surge.cjs，而不是 surge CLI：
+// CLI 在有代理环境变量的机器上会失败（surge-stream 不认 HTTPS_PROXY），
+// 而且 CLI 报出来的原因永远是 "Deployment did not succeed."，看不出真实原因。
 function deploy(token) {
   return new Promise((resolve) => {
-    const cp = spawn("surge", ["--token", token, "--project", ".", "--domain", DOMAIN], {
+    const cp = spawn(process.execPath, [path.join(__dirname, "deploy-surge.cjs"), DOMAIN, process.cwd()], {
       cwd: process.cwd(),
-      stdio: ["ignore", "pipe", "pipe"]
+      stdio: ["ignore", "pipe", "pipe"],
+      env: Object.assign({}, process.env, { SURGE_TOKEN: token })
     })
     let out = ""
     cp.stdout.on("data", (d) => (out += d))
     cp.stderr.on("data", (d) => (out += d))
     cp.on("error", (e) => resolve({ ok: false, out: out + e.message }))
     cp.on("close", (code) => {
-      const ok = code === 0 && /Success/i.test(out) && !/Invalid token|Unauthorized|forbidden/i.test(out)
+      const ok = code === 0 && /发布成功/.test(out)
       resolve({ ok, out })
     })
   })
@@ -163,7 +167,20 @@ async function verifyLive() {
 // ---------- 主流程 ----------
 
 async function main() {
-  // 1) 有缓存 token 就直接发布，不用再走登录
+  // 1) 优先用环境变量里的 token（CI 里配成 Actions secret，最省事）
+  if (process.env.SURGE_TOKEN) {
+    log("发现环境变量里的 token，直接发布")
+    const r = await deploy(process.env.SURGE_TOKEN.trim())
+    if (r.ok) {
+      const v = await verifyLive()
+      log("发布结果：", r.out.trim().split("\n").slice(-3).join(" "), "| 线上 SW：", v.version)
+      await upsertComment("✅ **已发布** " + DOMAIN + "（SW " + v.version + "）")
+      return
+    }
+    log("环境变量里的 token 失效，转登录流程：", r.out.trim().split("\n").slice(-2).join(" "))
+  }
+
+  // 2) 其次用缓存的 token
   if (fs.existsSync(TOKEN_FILE)) {
     const token = fs.readFileSync(TOKEN_FILE, "utf8").trim()
     if (token) {
@@ -180,7 +197,7 @@ async function main() {
     }
   }
 
-  // 2) 否则开会话，等用户批准
+  // 3) 否则开会话，等用户批准
   const approved = await waitForApproval()
   if (!approved) {
     log("本轮没等到批准")

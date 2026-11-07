@@ -4,7 +4,9 @@ name: surge 发布
 # 这个任务常驻跑：不断开新会话、把新鲜链接写进 issue #1，你点一下登录，
 # 批准之后任务自动发布 traebao-app-2.surge.sh，并把 token 缓存起来。
 #
-# 缓存里的 token 一旦拿到，后续发布就不再需要登录。
+# 更省事的做法：在仓库 Settings → Secrets 里加一个 SURGE_TOKEN，
+# 填 `surge token` 打印出来的 token，就完全不用再点登录链接了。
+# 缓存里的 token 一旦拿到，后续发布也不再需要登录。
 # 不想用 CI 的话，本地跑 `node tools/publish.cjs` 更快（token 存在 surge-token.txt）。
 
 on:
@@ -56,6 +58,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SURGE_DOMAIN: traebao-app-2.surge.sh
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
           SURGE_TOKEN_FILE: ${{ runner.temp }}/surge-token.txt
         run: node tools/surge-auto-login.cjs
 

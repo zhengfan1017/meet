@@ -1,20 +1,40 @@
 // 发布到 surge.sh
 //
-//   node tools/deploy-surge.js <域名> [项目目录]
+//   node tools/deploy-surge.cjs <域名> [项目目录]
 //
-// 两个沙箱相关的坑，这个脚本都绕开了：
+// 环境相关的坑，这个脚本都绕开了：
 //
-// 1. 账号必须验证邮箱，否则发布会被服务端拒绝，报 "Error - Deployment did not succeed."
-//    （命令行版不会告诉你原因，只有服务端知道）
-// 2. surge-stream 用原生 https.request，不认 HTTPS_PROXY 代理环境变量；
-//    沙箱出口必须走代理时，请求会直接失败。这里把它的 request 模块换成
-//    走 undici ProxyAgent 的版本。
+// 1. surge-stream 用原生 https.request，不认 HTTPS_PROXY 代理环境变量；
+//    沙箱出口必须走代理时，请求会直接失败。设了代理就把它的 request 模块
+//    换成走 undici ProxyAgent 的版本，没设代理就用原生实现。
+// 2. surge-stream 装在全局 npm 目录下，路径跟着 node 版本走；
+//    这里按当前 node 的安装位置动态找，不写死版本号。
 
 const path = require("path")
 const Module = require("module")
 const fs = require("fs")
+const { execFileSync } = require("child_process")
 
-const SURGE_HOME = path.join(process.env.HOME || "/root", ".nvm/versions/node/v24.1.0/lib/node_modules/surge/node_modules/surge-stream/lib")
+function findSurgeStream() {
+  const candidates = []
+  // 当前 node 的全局 node_modules
+  const globalRoot = path.dirname(path.dirname(process.execPath))
+  candidates.push(path.join(globalRoot, "lib", "node_modules", "surge", "node_modules", "surge-stream", "lib"))
+  // npm root -g（nvm 等场景下更准）
+  try {
+    const root = execFileSync("npm", ["root", "-g"], { encoding: "utf8" }).trim()
+    candidates.push(path.join(root, "surge", "node_modules", "surge-stream", "lib"))
+  } catch (e) {
+    // npm 不在 PATH 上就算了，靠上面的候选
+  }
+  for (const dir of candidates) {
+    if (fs.existsSync(path.join(dir, "stream.js"))) return dir
+  }
+  console.error("找不到 surge-stream，先跑 `npm install -g surge`")
+  process.exit(1)
+}
+
+const SURGE_HOME = findSurgeStream()
 const requestPath = path.join(SURGE_HOME, "request.js")
 
 const TOKEN = process.env.SURGE_TOKEN
@@ -26,15 +46,17 @@ if (!TOKEN) {
   process.exit(1)
 }
 if (!DOMAIN) {
-  console.error("用法：node tools/deploy-surge.js <域名> [项目目录]")
+  console.error("用法：node tools/deploy-surge.cjs <域名> [项目目录]")
   process.exit(1)
 }
+
+const PROXY = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy
 
 // ---- 代理版 request，替换 surge-stream 的原生实现 ----
 function makeRequest() {
   const { Readable } = require("stream")
-  const undici = require("/root/.nvm/versions/node/v24.1.0/lib/node_modules/undici")
-  const agent = new undici.ProxyAgent(process.env.HTTPS_PROXY || "http://127.0.0.1:18080")
+  const undici = loadUndici()
+  const agent = new undici.ProxyAgent(PROXY)
 
   const collect = (body) => {
     if (body === undefined || body === null) return Promise.resolve(undefined)
@@ -97,7 +119,19 @@ function makeRequest() {
   return request
 }
 
-if (fs.existsSync(requestPath)) {
+function loadUndici() {
+  try {
+    return require("undici")
+  } catch (e) {
+    // undici 不在项目依赖里，找全局 node_modules
+    const globalRoot = path.dirname(path.dirname(process.execPath))
+    const p = path.join(globalRoot, "lib", "node_modules", "undici")
+    if (fs.existsSync(p)) return require(p)
+    throw new Error("找不到 undici，装一个：npm install -g undici")
+  }
+}
+
+if (PROXY && fs.existsSync(requestPath)) {
   const m = new Module(requestPath, null)
   m.filename = requestPath
   m.loaded = true

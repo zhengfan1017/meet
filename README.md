@@ -162,7 +162,7 @@ node tools/publish.cjs <域名>    # 换域名
 ```
 
 沙箱环境里有个坑（原生 `https.request` 不认代理环境变量），`tools/publish.cjs` 内部调用的
-`tools/deploy-surge.cjs` 已经绕开了：
+`tools/deploy-surge.cjs` 已经绕开了（有代理走 undici ProxyAgent，没代理用原生实现）：
 
 ```bash
 SURGE_TOKEN=<你的 token> node tools/deploy-surge.cjs <域名> .
@@ -171,8 +171,13 @@ SURGE_TOKEN=<你的 token> node tools/deploy-surge.cjs <域名> .
 > **域名一旦发布就绑在那个 surge 账号上**，换账号发布会返回
 > `account does not have access to domain`。所以账号和域名要一起换，别只换一边。
 
-CI 自动发布用 `.github/workflows/surge-publish.yml`：它每小时开一个新的 surge 登录会话，
-把链接写进 issue #1，批准后自动发布并把 token 缓存起来（之后就不再需要登录）。
+CI 自动发布用 `.github/workflows/surge-publish.yml`。最省事的配法：在仓库
+**Settings → Secrets and variables → Actions** 里加一个 `SURGE_TOKEN`，
+内容填 `surge token` 打印出来的 token，之后每次 push 到 `main` 就自动发布，
+不用再点任何登录链接。
+
+不配 secret 也能跑：workflow 会每小时开一个新的 surge 登录会话，把链接写进
+issue #1，你点一下批准，任务自动发布并把 token 缓存起来（之后就不再需要登录）。
 
 ### Cloudflare Pages
 
